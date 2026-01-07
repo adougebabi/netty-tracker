@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ccw-tools__smart_search",
+      "Bash(tree:*)",
+      "Bash(codeagent-wrapper:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(mvn test-compile:*)",
+      "Bash(chmod:*)",
+      "mcp__jetbrains__replace_text_in_file"
+    ]
+  }
+}

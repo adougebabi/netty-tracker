@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  # BitTorrent Tracker Server
+  tracker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: netty-tracker
+    ports:
+      - "6969:6969"
+    networks:
+      - bt-network
+    restart: unless-stopped
+
+  # qBittorrent Seeder (做种者)
+  qb-seeder:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qb-seeder
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8080
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    volumes:
+      - ./config-seeder:/config
+      - ./test-files:/data
+    networks:
+      - bt-network
+    depends_on:
+      - tracker
+    restart: unless-stopped
+
+  # qBittorrent Leecher (下载者)
+  qb-leecher:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qb-leecher
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8081
+    ports:
+      - "8081:8081"
+      - "6882:6882"
+      - "6882:6882/udp"
+    volumes:
+      - ./config-leecher:/config
+      - ./downloads:/downloads
+    networks:
+      - bt-network
+    depends_on:
+      - tracker
+    restart: unless-stopped
+
+networks:
+  bt-network:
+    driver: bridge
